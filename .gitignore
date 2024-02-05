@@ -1,0 +1,15 @@
+## db
+/data
+
+## cache
+/app/__pycache__
+app/user/__pycache__
+
+## venv
+/.venv
+
+## env
+.env
+
+## etc
+.DS_Store
