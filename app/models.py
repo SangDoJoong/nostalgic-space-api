@@ -9,6 +9,6 @@ class User(Base):
 
     uid = Column(Integer, primary_key=True)
     password = Column(String, nullable=False)
-    created_dt = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False)
     image_id = Column(String, nullable=False)
     name = Column(String, nullable=False)
