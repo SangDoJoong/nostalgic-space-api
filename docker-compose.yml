@@ -2,7 +2,7 @@
 version: '3'
 services:
   # 서비스 명
-  postgresql:
+  db:
     # 사용할 이미지
     image: postgres
     # 컨테이너 실행 시 재시작
@@ -15,16 +15,28 @@ services:
     # 환경 변수 설정
     environment:
       # PostgreSQL 계정 및 패스워드 설정 옵션
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: sangdojoong123!@#
+      POSTGRES_USER: api_test
+      POSTGRES_PASSWORD: sangdojoong
     # 볼륨 설정
     volumes:
       - ./data/postgres/:/var/lib/postgresql/data
+    networks:
+      - backend
 
   fastapi:
-    image: fastapi
+    image: fastapi:latest
     command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload
     ports:
-      - 8080:8080
+      - '8080:8080'
+    depends_on:
+      - db
+    links:
+      - db
     volumes:
       - ./app:/code/app
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
