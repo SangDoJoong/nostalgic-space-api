@@ -11,10 +11,13 @@ DB_NAME = os.environ.get("DB_NAME")
 DB_USERNAME = os.environ.get("DB_USERNAME")
 DB_PASSWORD = os.environ.get("DB_PASSWORD")
 
+# SQLALCHEMY_DATABASE_URL = (
+#     f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+# )
 SQLALCHEMY_DATABASE_URL = (
-    f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+    f"postgresql://api_test:sangdojoong@db:5432/postgres"
 )
-
+print(SQLALCHEMY_DATABASE_URL)
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
