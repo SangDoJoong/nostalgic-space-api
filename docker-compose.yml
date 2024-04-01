@@ -36,6 +36,8 @@ services:
       - ./app:/code/app
     networks:
       - backend
+    env_file:
+      - secret.env
 
 networks:
   backend:
