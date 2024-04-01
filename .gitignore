@@ -9,7 +9,7 @@ app/user/__pycache__
 /.venv
 
 ## env
-.env
+secret.env
 
 ## etc
 .DS_Store
