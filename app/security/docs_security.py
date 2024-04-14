@@ -9,10 +9,12 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
-
+from dotenv import load_dotenv
+import os
+load_dotenv()
 # 인증정보 
-name= "sangdo"
-password = "sangdo"
+secret_name= os.environ.get("SWAGGER_NAME")
+secret_password = os.environ.get("SWAGGER_PASSWORD")
 
 class ApidocBasicAuthMiddleware(BaseHTTPMiddleware):
 
@@ -24,12 +26,14 @@ class ApidocBasicAuthMiddleware(BaseHTTPMiddleware):
                 try:
                     scheme, credentials = auth_header.split()
                     if scheme.lower() == 'basic':
+                        
                         decoded = base64.b64decode(credentials).decode('ascii')
                         username, password = decoded.split(':')
                         correct_username = secrets.compare_digest(
-                            username, name)
+                            username, secret_name)
+                        
                         correct_password = secrets.compare_digest(
-                            password, password)
+                            password, secret_password)
                         if correct_username and correct_password:
                             return await call_next(request)
                 except Exception:
