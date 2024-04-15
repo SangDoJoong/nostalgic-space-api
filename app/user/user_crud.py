@@ -2,13 +2,15 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from models import User
 from user.user_schema import UserCreate
+import pendulum
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def create_user(db: Session, user_create: UserCreate):
     db_user = User(
-        name=user_create.name, password=pwd_context.hash(user_create.password1)
+        name=user_create.name, password=pwd_context.hash(user_create.password1), created_at = pendulum.now("Asia/Seoul")
     )
     db.add(db_user)
     db.commit()
