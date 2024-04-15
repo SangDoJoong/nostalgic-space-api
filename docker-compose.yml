@@ -24,7 +24,7 @@ services:
       - backend
 
   fastapi:
-    image: fastapi:latest
+    image: sangdo_fastapi:0.1
     command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload
     ports:
       - '8080:8080'
