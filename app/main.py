@@ -6,9 +6,23 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from security import docs_security
 from user import user_router
+from fastapi.middleware.cors import CORSMiddleware
+
 #from content import content_router
 app = FastAPI(docs_url=None, openapi_url=None, redoc_url=None)
 app.add_middleware(docs_security.ApidocBasicAuthMiddleware)
+
+
+origins = [
+	"*"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get(
     '/docs',
