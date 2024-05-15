@@ -14,7 +14,8 @@ app.add_middleware(docs_security.ApidocBasicAuthMiddleware)
 
 
 origins = [
-	"*"
+    "http://localhost",
+    "http://144.24.78.166"
 ]
 app.add_middleware(
     CORSMiddleware,
