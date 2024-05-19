@@ -6,6 +6,7 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from security import docs_security
 from user import user_router
+from image import image_router
 from fastapi.middleware.cors import CORSMiddleware
 
 #from content import content_router
@@ -52,3 +53,4 @@ async def get_redoc() -> HTMLResponse:
 
 app.include_router(user_router.router)
 #app.include_router(content_router.router)
+app.include_router(image_router.router)
