@@ -10,6 +10,7 @@ from database import get_db
 from image import image_crud, image_schema
 from image.image_schema import ImageCreate
 from dotenv import load_dotenv
+from typing import Optional
 import os
 
 load_dotenv()
@@ -18,10 +19,9 @@ ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 router = APIRouter(
     prefix="/api/image",
 )
-UPLOAD_DIR = PATH = os.getcwd() + os.path.expanduser("/uploads")
 @router.post("/upload/")
 async def upload_images(_user_id: int = Form(...),
-    _content_id: int = Form(...), db: Session = Depends(get_db),files: List[UploadFile] = File(...)):
+    _content_id:  Optional[int]= Form(None), db: Session = Depends(get_db),files: List[UploadFile] = File(...)):
 
     saved_file_paths = []
     for file in files:
@@ -32,7 +32,7 @@ async def upload_images(_user_id: int = Form(...),
             #print(f"{file_contents} \n {os.path.splitext(file.filename)}")
             _, file_extension = os.path.splitext(file.filename)
             file_name= f"{datetime.now().strftime('%Y%m%d%H%M%S%f')}{file_extension}"
-            saved_file_path = os.path.join(UPLOAD_DIR, file_name)  # 이미지를 저장할 경로
+            saved_file_path = os.path.join(f"/code/app/uploads/", file_name)  # 이미지를 저장할 경로
             print(saved_file_path)
             with open(saved_file_path, "wb") as f:
                 f.write(file_contents)

@@ -11,6 +11,7 @@ from image import image_crud, image_schema
 from image.image_schema import ImageCreate
 from dotenv import load_dotenv
 from sqlalchemy.exc import SQLAlchemyError
+
 import os
 import pendulum
 load_dotenv()
@@ -19,10 +20,15 @@ load_dotenv()
 
 def create_image(db: Session, image_create: ImageCreate, _image_url):
     try :
-        db_image= Image(
-            user_id = image_create.user_id,content_id= image_create.content_id , created_at = pendulum.now("Asia/Seoul"),image_address=_image_url
-        )
-        print(db_image)
+        if image_create.content_id == None:
+    
+            db_image= Image(
+                user_id = image_create.user_id, created_at = pendulum.now("Asia/Seoul"),image_address=_image_url
+            )
+        else:
+            db_image= Image(
+                user_id = image_create.user_id,content_id= image_create.content_id , created_at = pendulum.now("Asia/Seoul"),image_address=_image_url
+            )
         db.add(db_image)
         db.commit()
         db.refresh(db_image)
