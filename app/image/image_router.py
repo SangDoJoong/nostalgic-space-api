@@ -32,7 +32,7 @@ async def upload_images(_user_id: int = Form(...),
             #print(f"{file_contents} \n {os.path.splitext(file.filename)}")
             _, file_extension = os.path.splitext(file.filename)
             file_name= f"{datetime.now().strftime('%Y%m%d%H%M%S%f')}{file_extension}"
-            saved_file_path = os.path.join(f"/code/app/uploads/", file_name)  # 이미지를 저장할 경로
+            saved_file_path = os.path.join(f"/uploads/", file_name)  # 이미지를 저장할 경로
             print(saved_file_path)
             with open(saved_file_path, "wb") as f:
                 f.write(file_contents)
