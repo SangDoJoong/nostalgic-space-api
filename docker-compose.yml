@@ -34,6 +34,7 @@ services:
       - db
     volumes:
       - ./app:/code/app
+      - - /home/ubuntu/uploads:/uploads
     networks:
       - backend
     env_file:
