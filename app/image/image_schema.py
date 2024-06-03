@@ -4,12 +4,16 @@ from fastapi import APIRouter, HTTPException
 from typing import Optional
 
 class ImageCreate(BaseModel):
+    user_id : int 
+    image_address:str 
     
-    user_id:int
-    content_id: Optional[int] = None 
-    
-    
+class UserImageCreate(BaseModel):
+        
+    image_address:str    
 
+class ContentImageCreate(BaseModel):
+        
+    image_address:str 
 
 class Token(BaseModel):
     access_token: str

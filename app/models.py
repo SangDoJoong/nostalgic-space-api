@@ -17,7 +17,18 @@ class Image(Base):
     __tablename__ = "Images"
 
     image_id = Column(Integer, primary_key=True)
-    user_id =Column(Integer, primary_key=False)
-    content_id= Column(Integer, primary_key=False)
     image_address = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
+
+
+class UserImage(Base):
+    __tablename__ = "Users_Images"
+    id =Column(Integer, primary_key=True)
+    user_id =Column(Integer, primary_key=False)
+    image_id =Column(Integer, primary_key=False)
+
+class ContentImage(Base):
+    __tablename__ = "Contents_Images"
+    id =Column(Integer, primary_key=True)
+    content_id =Column(Integer, primary_key=False)
+    image_id =Column(Integer, primary_key=False)
