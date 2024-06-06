@@ -11,7 +11,7 @@ class User(Base):
     password = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
     image_id = Column(String, nullable=False)
-    name = Column(String, nullable=False)
+    username = Column(String, nullable=False)
 
 class Image(Base):
     __tablename__ = "Images"

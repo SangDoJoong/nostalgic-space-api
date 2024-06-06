@@ -4,11 +4,11 @@ from fastapi import APIRouter, HTTPException
 
 
 class UserCreate(BaseModel):
-    name: str
+    username: str
     password1: str
     password2: str
 
-    @validator("name", "password1", "password2")
+    @validator("username", "password1", "password2")
     def not_empty(cls, v):
         if not v or not v.strip():
             raise HTTPException(

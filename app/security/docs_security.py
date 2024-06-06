@@ -11,7 +11,9 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from dotenv import load_dotenv
 import os
-load_dotenv(dotenv_path='../secret.env')
+
+load_dotenv()
+
 # 인증정보 
 secret_name= os.environ.get("SWAGGER_NAME")
 
