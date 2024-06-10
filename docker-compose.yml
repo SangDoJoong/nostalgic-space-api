@@ -4,7 +4,7 @@ services:
   # 서비스 명
   db:
     # 사용할 이미지
-    image: postgres
+    image: sangdo_postgis:0.1
     # 컨테이너 실행 시 재시작
     restart: always
     # 컨테이너명 설정
