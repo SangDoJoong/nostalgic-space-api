@@ -48,7 +48,9 @@ async def upload_user_image(_user_id: int = Form(...), db: Session = Depends(get
     return {
         "status_code": status.HTTP_200_OK,
         "detail": "정상적으로 저장되었습니다.",
-        "indexes": image_ids
+        "data":{ 
+            "image_id " : image_ids
+            }
     }
 
 @router.post("/upload/contentimage")
