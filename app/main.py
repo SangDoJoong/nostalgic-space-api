@@ -7,6 +7,7 @@ from fastapi.openapi.utils import get_openapi
 from security import docs_security
 from user import user_router
 from image import image_router
+from map import map_router
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
@@ -54,3 +55,4 @@ async def get_redoc() -> HTMLResponse:
 app.include_router(user_router.router)
 #app.include_router(content_router.router)
 app.include_router(image_router.router)
+app.include_router(map_router.router)
