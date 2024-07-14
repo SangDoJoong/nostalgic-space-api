@@ -10,5 +10,3 @@ class MapResponse(BaseModel):
     map_id: int
     latitude: float
     longitude: float
-    uid: int
-    content_id: int

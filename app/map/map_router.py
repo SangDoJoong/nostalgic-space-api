@@ -6,7 +6,7 @@ from database import get_db
 
 router = APIRouter()
 
-@router.post("/maps/save")
+@router.post("/map_marker/save")
 def create_map_point(map_point: map_schema.MapCreate, db: Session = Depends(get_db)):
     map_crud.create_map_point(db=db, map_point=map_point)
     

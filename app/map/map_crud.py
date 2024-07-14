@@ -8,8 +8,6 @@ def create_map_point(db: Session, map_point: map_schema.MapResponse):
         latitude=map_point.latitude,
         longitude=map_point.longitude,
         location=f'POINT({map_point.longitude} {map_point.latitude})',
-        uid=map_point.uid,
-        content_id=map_point.content_id
     )
     db.add(db_map_point)
     db.commit()

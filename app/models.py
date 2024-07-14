@@ -34,11 +34,9 @@ class ContentImage(Base):
     content_id =Column(Integer, primary_key=False)
     image_id =Column(Integer, primary_key=False)
     
-class Map(Base):
-    __tablename__ = "Maps"
+class map_marker(Base):
+    __tablename__ = "map_marker"
     map_id = Column(Integer, primary_key=True)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     location = Column(Geometry('POINT'), nullable=False)
-    uid = Column(Integer, nullable=False)
-    content_id = Column(Integer, nullable=False)
