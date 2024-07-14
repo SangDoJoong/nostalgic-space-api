@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey,Boolean
 from sqlalchemy.orm import relationship
 
-from database import Base
+from database.database_init import Base
 
 
 class User(Base):
@@ -10,9 +10,18 @@ class User(Base):
     uid = Column(Integer, primary_key=True)
     password = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
-    image_id = Column(String, nullable=False)
     username = Column(String, nullable=False)
+class Content(Base):
+    __tablename__ = "Contents"
 
+    contents_id = Column(Integer,primary_key=True)
+    title = Column(String,nullable=True)
+    content  = Column(String,nullable=True)
+    writer_name = Column(String, primary_key=False)
+    created_at = Column(DateTime, nullable=False)
+    like_cnt = Column(Integer, nullable=False)
+    is_deleted=Column(Boolean,nullable=False)
+    
 class Image(Base):
     __tablename__ = "Images"
 

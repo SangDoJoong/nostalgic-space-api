@@ -1,41 +1,58 @@
 from datetime import timedelta, datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException,File,UploadFile,Form
 from fastapi import Depends
-from fastapi.security import OAuth2PasswordRequestForm
+from typing import List
+from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 from starlette import status
-from database import get_db
-from content import content_crud,content_schema
-from dotenv import load_dotenv
+from database.database_init import get_db
+from content import content_crud
+from user.user_router import get_current_user
+from image.image_router import save_file
+from image.image_crud import create_image
+from image.image_schema import ImageCreate
+from content.content_schema import ContentCreate
 import os
 
-load_dotenv()
-
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
-SECRET_KEY = os.environ.get("SECRET_KEY")
-ALGORITHM = "HS256"
 
 router = APIRouter(
     prefix="/api/content",
 )
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/token")
 
+@router.post("/create")
+async def content_create( _title: str = Form(...),
+    _content: str = Form(...),files: List[UploadFile] = File(...), db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    
+    try:
+        _content_create=ContentCreate(title=_title,content=_content)
+        image_ids = []
+        print(_content_create)
+        for file in files:
+            saved_file_path = await save_file(file)
+            _image_create = ImageCreate(image_address=saved_file_path)
+            image_id = create_image(db=db, image_create=_image_create)
+            image_ids.append(image_id)
+        contents_id=content_crud.create_content(current_user,db=db,content_create=_content_create,image_ids=image_ids)
+    
+        return {
+            "status_code": status.HTTP_200_OK,
+            "detail": "정상적으로 저장되었습니다.",
+            "data":{ 
+                "content_id_index " : contents_id
+                }
+        }
+    except HTTPException as e:
+            raise e
+    
 
-@router.post("/create", status_code=status.HTTP_204_NO_CONTENT)
-def content_create(_content_create: content_schema.ContentCreate, db: Session = Depends(get_db)):
-    print(_content_create)
-    content_crud.create_content(db=db,content_create=_content_create)
+@router.get("/refresh", status_code=status.HTTP_204_NO_CONTENT)
+def content_refresh( db: Session = Depends(get_db)):
+    
+    #content_crud.create_content(db=db,content_create=_content_create)
     
     return {
         "status_code": status.HTTP_200_OK,
         "detail":"정상적으로 생성되었습니다.",
     }
-    '''
-        user = user_crud.get_existing_user(db, user_create=_user_create)
-        if user:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="이미 존재하는 사용자입니다."
-            )
-        user_crud.create_user(db=db, user_create=_user_create)
-    '''
-

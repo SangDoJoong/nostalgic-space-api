@@ -4,23 +4,15 @@ from pydantic import BaseModel, validator, EmailStr
 from fastapi import APIRouter, HTTPException
 
 class ContentCreate(BaseModel):
-    title : str 
+    title: str
     content: str
-    writer_id : int
-    @validator("content")
-    def not_empty(cls, v):
+
+    @validator("content", "title", pre=True, always=True)
+    def not_empty(cls, v, field):
         if not v or not v.strip():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="글이 없는 컨텐츠는 허용되지 않습니다."
-            )
-        return v
-    @validator("title")
-    def not_empty(cls, v):
-        if not v or not v.strip():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="제목이 없는 컨텐츠는 허용되지 않습니다."
+                detail=f"{field.name}이(가) 비어있을 수 없습니다."
             )
         return v
 

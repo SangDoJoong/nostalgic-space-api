@@ -4,20 +4,19 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 from starlette import status
-from database import get_db
+from database.database_init import get_db
 from user.user_crud import pwd_context
 from user import user_crud, user_schema
-from dotenv import load_dotenv
+
 import os
 
 
-load_dotenv()
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/token")
 
 
 router = APIRouter(
@@ -38,7 +37,6 @@ def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_
         "status_code": status.HTTP_200_OK,
         "detail":"정상적으로 생성되었습니다.",
     }
-
 
 @router.post("/login")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
@@ -67,9 +65,28 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
             "username": user.username,
         }
     }
+@router.post("/token")
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
+                           db: Session = Depends(get_db)):
+    
+    user = user_crud.get_user(db, form_data.username)
+    if not user or not pwd_context.verify(form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="아이디 혹은 패스워드가 일치하지 않습니다.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    data = {
+        "sub": user.username,
+        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    }
+    
+    access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+    return {"access_token": access_token, "token_type": "bearer"}
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
-    print(token)
+    
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -90,5 +107,4 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     
 @router.get("/me")
 def read_users_me(current_user: dict = Depends(get_current_user)):
-    
     return current_user
