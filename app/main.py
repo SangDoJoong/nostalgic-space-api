@@ -5,15 +5,19 @@ from fastapi.responses import HTMLResponse
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from security import docs_security
+from middleware import response_middleware
 from user import user_router
 from image import image_router
 from map import map_router
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
+# from app.middleware.response_middleware import ResponseMiddleware
+
 #from content import content_router
 app = FastAPI(docs_url=None, openapi_url=None, redoc_url=None)
 app.add_middleware(docs_security.ApidocBasicAuthMiddleware)
+app.add_middleware(response_middleware.ResponseMiddleware)
 
 
 origins = os.getenv('CORS_ORIGINS').split(',')
