@@ -14,4 +14,4 @@ secret.env
 .DS_Store
 
 ## key 
-app/ssh-key-omok.key
+*.key
