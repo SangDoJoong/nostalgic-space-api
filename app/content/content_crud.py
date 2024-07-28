@@ -7,7 +7,7 @@ from content.content_schema import ContentCreate
 import pendulum
 from sqlalchemy.exc import SQLAlchemyError
 
-def create_content(current_user: dict,db: Session, content_create: ContentCreate, image_ids: List[int]):
+def create_content(current_user: dict,db: Session, content_create: ContentCreate):
     try:
 
         db_content = Content(
@@ -20,14 +20,8 @@ def create_content(current_user: dict,db: Session, content_create: ContentCreate
         )
         db.add(db_content)
         db.flush()
-
-        for _image_id in image_ids:
-            db_content_image = ContentImage(
-            content_id=db_content.contents_id,
-            image_id=_image_id
-            )
-            db.add(db_content_image)
         
+       
         db.commit()
 
         return db_content.contents_id

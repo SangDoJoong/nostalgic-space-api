@@ -6,7 +6,6 @@ from typing import Optional
 class ImageCreate(BaseModel):
     
     image_address:str 
-    
 
 
 class Token(BaseModel):

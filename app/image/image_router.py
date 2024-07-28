@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
-from fastapi import APIRouter, HTTPException
-from fastapi import Depends,File ,UploadFile,Form,Query
+from fastapi import APIRouter, HTTPException, Query
+from fastapi import Depends,File ,UploadFile,Form
 from fastapi.responses import FileResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
@@ -8,10 +8,9 @@ from sqlalchemy.orm import Session
 from starlette import status
 from typing import List
 from database.database_init import get_db
-from image import image_crud, image_schema
+from image import image_crud
 from image.image_schema import ImageCreate
 from user.user_router import get_current_user
-from typing import Optional
 import os
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 router = APIRouter(
@@ -34,14 +33,34 @@ async def save_file(file: UploadFile, upload_dir: str = "/uploads/") -> str:
         raise HTTPException(status_code=500, detail=f"Failed to save file {file.filename}")
 
 @router.post("/userimage")
-async def upload_user_image(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db),files: List[UploadFile] = File(...)):
-    _username=current_user["username"]
+async def upload_userimage(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db),file: UploadFile = File(...)):
+    
+    image_ids = []
+    try:
+            saved_file_path = await save_file(file)
+            _image_create = ImageCreate(image_address=saved_file_path)
+            image_id = image_crud.create_userimage(db=db, image_create=_image_create, username=current_user.username)
+            image_ids.append(image_id)
+    except HTTPException as e:
+        raise e
+        
+    return {
+        "status_code": status.HTTP_200_OK,
+        "detail": "정상적으로 저장되었습니다.",
+        "data":{ 
+            "image_id_index " : image_ids
+            }
+    }
+    
+@router.post("/contentimage")
+async def upload_contentimage(db: Session = Depends(get_db),files: List[UploadFile] = File(...),content_id : int = Form(...)):
+
     image_ids = []
     for file in files:
         try:
             saved_file_path = await save_file(file)
             _image_create = ImageCreate(image_address=saved_file_path)
-            image_id = image_crud.create_user_image(db=db, image_create=_image_create, username=_username)
+            image_id = image_crud.create_contentimage(db=db, image_create=_image_create, content_id=content_id)
             image_ids.append(image_id)
         except HTTPException as e:
             raise e
@@ -53,14 +72,27 @@ async def upload_user_image(current_user: dict = Depends(get_current_user), db: 
             "image_id_index " : image_ids
             }
     }
-    
-
 
 @router.get("/userimage")
-def get_user_images(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_userimages(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
     _username=current_user["username"]
     
     user_images = image_crud.get_user_image(db, _username)
+    if not user_images:
+        raise HTTPException(status_code=404, detail="User images not found")
+    return {
+        "status_code": status.HTTP_200_OK,
+        "detail": "이미지 정보가 업로드 되었습니다",
+        "data":{ 
+            "image_id_index " : user_images
+            }
+    }
+
+@router.get("/contentimage")
+def get_contentimages(content_id: str=Query(...), db: Session = Depends(get_db)):
+    
+    
+    user_images = image_crud.get_content_image(db, content_id)
     if not user_images:
         raise HTTPException(status_code=404, detail="User images not found")
     return {
