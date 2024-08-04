@@ -28,15 +28,20 @@ router = APIRouter(
 def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_db)):
     user = user_crud.get_existing_user(db, user_create=_user_create)
     if user:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, 
-            detail="이미 존재하는 사용자입니다."
-        )
+        return {
+            "status_code": status.HTTP_409_CONFLICT,
+            "detail": "이미 존재하는 사용자입니다.",
+            "data": {
+                "username": _user_create.username
+            }
+        }
     user_crud.create_user(db=db, user_create=_user_create)
     
     return {
-        "status_code": status.HTTP_200_OK,
-        "detail":"정상적으로 생성되었습니다.",
+        "detail": "정상적으로 생성되었습니다.",
+        "data": {
+            "username": _user_create.username
+        }
     }
 
 
