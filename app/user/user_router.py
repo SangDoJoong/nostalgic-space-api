@@ -38,6 +38,7 @@ def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_
     user_crud.create_user(db=db, user_create=_user_create)
     
     return {
+        "status_code": status.HTTP_200_OK,
         "detail": "정상적으로 생성되었습니다.",
         "data": {
             "username": _user_create.username
@@ -51,11 +52,11 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
 
     user = user_crud.get_user(db, form_data.username)
     if not user or not pwd_context.verify(form_data.password, user.password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="아이디 혹은 패스워드가 일치하지 않습니다.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        return {
+            "status_code":status.HTTP_401_UNAUTHORIZED,
+            "detail":"아이디 혹은 패스워드가 일치하지 않습니다.",
+            # "data"={"WWW-Authenticate": "Bearer"},
+        }
 
     data = {
         "sub": user.username,
