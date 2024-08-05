@@ -12,3 +12,6 @@ secret.env
 
 ## etc
 .DS_Store
+
+## key 
+*.key
