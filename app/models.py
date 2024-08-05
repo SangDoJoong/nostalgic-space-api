@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Float
 from sqlalchemy.orm import relationship
+from geoalchemy2 import Geometry
 
 from database import Base
 
@@ -31,3 +32,10 @@ class ContentImage(Base):
     id =Column(Integer, primary_key=True)
     content_id =Column(Integer, primary_key=False)
     image_id =Column(Integer, primary_key=False)
+    
+class map_marker(Base):
+    __tablename__ = "map_marker"
+    map_id = Column(Integer, primary_key=True)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    location = Column(Geometry('POINT'), nullable=False)

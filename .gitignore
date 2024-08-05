@@ -9,6 +9,7 @@ __pycache__
 
 ## env
 secret.env
+.env
 
 ## etc
 .DS_Store
