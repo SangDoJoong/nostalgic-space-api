@@ -1,6 +1,6 @@
-from pydantic import BaseModel, validator, EmailStr
+from fastapi import HTTPException
+from pydantic import BaseModel, validator
 from starlette import status
-from fastapi import APIRouter, HTTPException
 
 
 class UserCreate(BaseModel):
@@ -13,7 +13,7 @@ class UserCreate(BaseModel):
         if not v or not v.strip():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="빈 값은 허용되지 않습니다."
+                detail="빈 값은 허용되지 않습니다.",
             )
         return v
 

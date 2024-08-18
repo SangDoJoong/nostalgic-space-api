@@ -1,8 +1,9 @@
+import os
+
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
@@ -25,5 +26,5 @@ def get_db():
     db = SessionLocal()
     try:
         yield db
-    except:
+    except Exception:
         db.close()

@@ -1,11 +1,9 @@
-from pydantic import BaseModel, validator, EmailStr
-from starlette import status
-from fastapi import APIRouter, HTTPException
-from typing import Optional
+from pydantic import BaseModel
+
 
 class ImageCreate(BaseModel):
-    
-    image_address:str 
+
+    image_address: str
 
 
 class Token(BaseModel):
