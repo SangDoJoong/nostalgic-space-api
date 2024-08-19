@@ -6,12 +6,15 @@ __pycache__
 
 ## venv
 /.venv
+venv
 
 ## env
 secret.env
+.env
 
 ## etc
 .DS_Store
+.vscode
 
 ## key 
 *.key
