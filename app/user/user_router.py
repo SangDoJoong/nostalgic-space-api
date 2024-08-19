@@ -45,7 +45,8 @@ def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_
         }
     }
 
-
+##todo : jwt token을 이용한 로그인 구현
+## form 말고 username , password를 받아서 로그인 구현
 @router.post("/login")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
                            db: Session = Depends(get_db)):

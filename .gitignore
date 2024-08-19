@@ -3,6 +3,7 @@
 
 ## cache
 __pycache__
+app/security/__pycache__/
 
 ## venv
 /.venv
@@ -10,6 +11,7 @@ __pycache__
 ## env
 secret.env
 .env
+
 
 ## etc
 .DS_Store

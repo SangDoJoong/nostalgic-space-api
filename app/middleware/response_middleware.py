@@ -5,6 +5,9 @@ from starlette.responses import Response, StreamingResponse
 
 class ResponseMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        if request.url.path in ["/docs", "/openapi.json", "/redoc"]:
+            return await call_next(request)
+
         response = await call_next(request)
 
         if isinstance(response, StreamingResponse):
