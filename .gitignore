@@ -2,8 +2,8 @@
 /data
 
 ## cache
-__pycache__
-app/security/__pycache__/
+*.pyc
+__pycache__/
 
 ## venv
 /.venv

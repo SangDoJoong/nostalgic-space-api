@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request, Form
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
@@ -17,7 +17,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/token")
 
 
 router = APIRouter(
@@ -31,52 +31,100 @@ def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_
         return {
             "status_code": status.HTTP_409_CONFLICT,
             "detail": "이미 존재하는 사용자입니다.",
-            "data": {
-                "username": _user_create.username
-            }
+            "username": _user_create.username
         }
     user_crud.create_user(db=db, user_create=_user_create)
     
     return {
         "status_code": status.HTTP_200_OK,
         "detail": "정상적으로 생성되었습니다.",
-        "data": {
-            "username": _user_create.username
-        }
+        "username": _user_create.username
     }
 
-##todo : jwt token을 이용한 로그인 구현
-## form 말고 username , password를 받아서 로그인 구현
+def authenticate_user(db: Session, username: str, password: str):
+    user = user_crud.get_user(db, username)
+    if not user or not pwd_context.verify(password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="아이디 혹은 패스워드가 일치하지 않습니다.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    to_encode.update({
+        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    })
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+# @router.post("/login")
+# def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
+#                            db: Session = Depends(get_db)):
+#     try:
+#         user = authenticate_user(db, form_data.username, form_data.password)
+#         access_token = create_access_token({"sub": user.username})
+#         return {
+#             "status_code": status.HTTP_200_OK,
+#             "detail": "정상적으로 로그인되었습니다.",
+#             "data": {
+#                 "access_token": access_token,
+#                 "token_type": "bearer",
+#                 "username": user.username,
+#             }
+#         }
+#     except:
+#         return {
+#             "status_code": status.HTTP_401_UNAUTHORIZED,
+#             "detail":"아이디 혹은 패스워드가 일치하지 않습니다.",
+#             "data": {
+#                 "username": form_data.username
+#             }
+#         }
+
 @router.post("/login")
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
-                           db: Session = Depends(get_db)):
-
-    user = user_crud.get_user(db, form_data.username)
-    if not user or not pwd_context.verify(form_data.password, user.password):
+def login_for_access_token(
+    username: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    try:
+        user = authenticate_user(db, username, password)
+        access_token = create_access_token({"sub": user.username})
         return {
-            "status_code":status.HTTP_401_UNAUTHORIZED,
-            "detail":"아이디 혹은 패스워드가 일치하지 않습니다.",
-            # "data"={"WWW-Authenticate": "Bearer"},
-        }
-
-    data = {
-        "sub": user.username,
-        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-    }
-    
-    access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
-    return {
-        "status_code": status.HTTP_200_OK,
-        "detail":"정상적으로 로그인되었습니다.",
-        "data":{
+            "status_code": status.HTTP_200_OK,
+            "detail": "정상적으로 로그인되었습니다.",
             "access_token": access_token,
             "token_type": "bearer",
             "username": user.username,
         }
+
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="아이디 혹은 패스워드가 일치하지 않습니다.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        # return {
+        #     "status_code": status.HTTP_401_UNAUTHORIZED,
+        #     "detail":"아이디 혹은 패스워드가 일치하지 않습니다.",
+        #     "username": username
+        # }
+
+@router.post("/token")
+def test(form_data: OAuth2PasswordRequestForm = Depends(),
+                           db: Session = Depends(get_db)):
+    user = authenticate_user(db, form_data.username, form_data.password)
+    access_token = create_access_token({"sub": user.username})
+    return {
+        "status_code": status.HTTP_200_OK,
+        "detail": "토큰이 발급되었습니다.",
+        "access_token": access_token,
+        "token_type": "bearer",
+        "username": user.username,
     }
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
-    print(token)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
