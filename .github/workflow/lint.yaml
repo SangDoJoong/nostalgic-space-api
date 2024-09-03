@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubnutu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: action/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Run pre-commit
+        uses: pre-commit/action@3.0.1
+        env:
+          SKIP: no-commit-to-branch
