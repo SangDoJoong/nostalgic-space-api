@@ -1,5 +1,9 @@
+import argparse
 import os
 
+import uvicorn
+
+from config.settings import Settings
 from content import content_router
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -28,6 +32,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get(
+    "/ping",
+)
+async def ping() -> JSONResponse:
+    return JSONResponse(content={"message": "pong"})
+
+
+@app.get("/env")
+async def root():
+    return {"app_env": settings}
 
 
 @app.get(
@@ -62,3 +78,13 @@ async def get_redoc() -> HTMLResponse:
 app.include_router(user_router.router)
 app.include_router(content_router.router)
 app.include_router(image_router.router)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-env', '--APP_ENV', type=str, default='local')
+    args = parser.parse_args()
+
+    os.environ['APP_ENV'] = args.APP_ENV
+    settings = Settings()
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
