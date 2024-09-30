@@ -1,5 +1,5 @@
 import pendulum
-from content.content_schema import ContentCreate
+from api.content.content_schema import ContentCreate
 from fastapi import HTTPException
 from models import Content
 from sqlalchemy.exc import SQLAlchemyError

@@ -2,14 +2,14 @@ import os
 from datetime import datetime
 from typing import List
 
-from database.database_init import get_db
+from config.database_init import get_db
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.security import OAuth2PasswordBearer
-from image import image_crud
-from image.image_schema import ImageCreate
+from api.image import image_crud
+from api.image.image_schema import ImageCreate
 from sqlalchemy.orm import Session
 from starlette import status
-from user.user_router import get_current_user
+from api.user.user_router import get_current_user
 
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif"}
 router = APIRouter(

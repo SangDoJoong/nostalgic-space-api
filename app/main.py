@@ -4,16 +4,16 @@ import os
 import uvicorn
 
 from config.settings import Settings
-from content import content_router
+from app.api.content import content_router
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import HTMLResponse, JSONResponse
-from image import image_router
-from security import docs_security
-from user import user_router
+from app.api.image import image_router
+from app.config import docs_security
+from app.api.user import user_router
 
 # Load environment variables
 load_dotenv()

@@ -1,11 +1,11 @@
-from content import content_crud
-from content.content_schema import ContentCreate
-from database.database_init import get_db
+from api.content import content_crud
+from api.content.content_schema import ContentCreate
+from config.database_init import get_db
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from starlette import status
-from user.user_router import get_current_user
+from api.user.user_router import get_current_user
 
 router = APIRouter(
     prefix="/api/content",
