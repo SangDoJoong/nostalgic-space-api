@@ -1,4 +1,4 @@
-from app.config.database_init import Base
+from config.database_init import Base
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 
 
