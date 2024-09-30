@@ -21,17 +21,15 @@ async def content_create(
 ):
 
     try:
-        _content_create = ContentCreate(
-            title=content_create.title, content=content_create.content
-        )
+
         contents_id = content_crud.create_content(
-            current_user, db=db, content_create=_content_create
+            current_user, db=db, content_create=content_create
         )
 
         return {
             "status_code": status.HTTP_200_OK,
             "detail": "정상적으로 저장되었습니다.",
-            "data": {"content_id_index ": contents_id},
+            "data": {"contents_id ": contents_id},
         }
     except HTTPException as e:
         raise e
