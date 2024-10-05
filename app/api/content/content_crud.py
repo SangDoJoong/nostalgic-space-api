@@ -1,9 +1,10 @@
 import pendulum
-from api.content.content_schema import ContentCreate
 from fastapi import HTTPException
-from models import Content
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+
+from api.content.content_schema import ContentCreate
+from models import Content
 
 
 def create_content(current_user: dict, db: Session, content_create: ContentCreate):
