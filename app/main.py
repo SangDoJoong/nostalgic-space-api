@@ -2,17 +2,18 @@ import argparse
 import os
 
 import uvicorn
-from api.content import content_router
-from api.image import image_router
-from api.user import user_router
-from config import docs_security
-from config.settings import Settings
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import HTMLResponse, JSONResponse
+
+from api.content import content_router
+from api.image import image_router
+from api.user import user_router
+from config import docs_security
+from config.settings import Settings
 
 # Load environment variables
 load_dotenv()
@@ -86,4 +87,4 @@ if __name__ == "__main__":
     os.environ["APP_ENV"] = args.APP_ENV
     settings = Settings()
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
