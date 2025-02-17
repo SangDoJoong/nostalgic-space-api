@@ -7,8 +7,11 @@
     kimdonghyeok
 """
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from geoalchemy2 import Geometry
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
+
 from config.database_init import Base
+
 
 class User(Base):
     """
@@ -22,6 +25,7 @@ class User(Base):
         created_at (datetime): 사용자 계정 생성일.
         username (str): 사용자 이름.
     """
+
     __tablename__ = "Users"
 
     uid = Column(Integer, primary_key=True)
@@ -45,6 +49,7 @@ class Content(Base):
         like_cnt (int): 콘텐츠 좋아요 수.
         is_deleted (bool): 콘텐츠 삭제 여부.
     """
+
     __tablename__ = "Contents"
 
     contents_id = Column(Integer, primary_key=True)
@@ -67,6 +72,7 @@ class Image(Base):
         image_address (str): 이미지 파일 경로 또는 URL.
         created_at (datetime): 이미지 생성일.
     """
+
     __tablename__ = "Images"
 
     image_id = Column(Integer, primary_key=True)
@@ -85,6 +91,7 @@ class UserImage(Base):
         user_id (int): 사용자 ID.
         image_id (int): 이미지 ID.
     """
+
     __tablename__ = "Users_Images"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, primary_key=False)
@@ -102,7 +109,26 @@ class ContentImage(Base):
         content_id (int): 콘텐츠 ID.
         image_id (int): 이미지 ID.
     """
+
     __tablename__ = "Contents_Images"
     id = Column(Integer, primary_key=True)
     content_id = Column(Integer, primary_key=False)
     image_id = Column(Integer, primary_key=False)
+
+
+class map_marker(Base):
+    """
+    지도 마커 정보를 저장하는 모델.
+
+    속성:
+        map_id (int): 마커의 고유 ID.
+        latitude (float): 마커의 위도.
+        longitude (float): 마커의 경도.
+        location (Geometry): 마커의 위치를 나타내는 포인트 형태의 지오메트리.
+    """
+
+    __tablename__ = "map_marker"
+    map_id = Column(Integer, primary_key=True)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    location = Column(Geometry("POINT"), nullable=False)

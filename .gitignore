@@ -15,6 +15,7 @@ secret.env
 ## etc
 .DS_Store
 .vscode
+.pythoin-version
 
 ## key
 *.key
