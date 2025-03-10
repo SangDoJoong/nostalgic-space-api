@@ -8,7 +8,7 @@
 """
 
 from geoalchemy2 import Geometry
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
 
 from config.database_init import Base
 
@@ -116,19 +116,46 @@ class ContentImage(Base):
     image_id = Column(Integer, primary_key=False)
 
 
-class map_marker(Base):
+class Map(Base):
     """
-    지도 마커 정보를 저장하는 모델.
+    지도 정보를 저장하는 모델 클래스.
 
-    속성:
-        map_id (int): 마커의 고유 ID.
-        latitude (float): 마커의 위도.
-        longitude (float): 마커의 경도.
-        location (Geometry): 마커의 위치를 나타내는 포인트 형태의 지오메트리.
+    이 클래스는 지도 중심 좌표 정보를 PostGIS의 POINT 타입으로 관리합니다.
+
+    :ivar map_id: 지도 고유 식별자 (자동 증가, 기본키).
+    :ivar center_location: 지도 중심 좌표를 저장하는 컬럼. PostGIS의 POINT 타입을 사용.
     """
 
-    __tablename__ = "map_marker"
-    map_id = Column(Integer, primary_key=True)
+    __tablename__ = "maps"
+    map_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    # 지도 중심 좌표 (PostGIS 사용)
+    center_location = Column(Geometry(geometry_type="POINT", srid=4326), nullable=False)
+
+
+class Marker(Base):
+    """
+    지도에 표시되는 마커 정보를 저장하는 모델 클래스.
+
+    이 클래스는 각 마커의 위치 정보와 추가 메타데이터(사용자 ID, 콘텐츠 ID 등)를 관리합니다.
+    마커는 특정 지도에 소속되며, 지도와의 외래키 관계를 유지합니다.
+
+    :ivar marker_id: 마커 고유 식별자 (자동 증가, 기본키).
+    :ivar map_id: 마커가 속한 지도 ID. 'maps' 테이블의 외래키.
+    :ivar latitude: 마커의 위도 값.
+    :ivar longitude: 마커의 경도 값.
+    :ivar location: 마커 위치 정보를 저장하는 컬럼. PostGIS의 POINT 타입을 사용.
+    :ivar uid: 마커와 관련된 사용자 ID (옵션).
+    :ivar content_id: 마커와 관련된 콘텐츠 ID (옵션).
+    """
+
+    __tablename__ = "markers"
+    marker_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    map_id = Column(
+        Integer, ForeignKey("maps.map_id", ondelete="CASCADE"), nullable=False
+    )
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    location = Column(Geometry("POINT"), nullable=False)
+    # 마커 위치 (PostGIS geometry)
+    location = Column(Geometry(geometry_type="POINT", srid=4326), nullable=False)
+    uid = Column(Integer, nullable=True)
+    content_id = Column(Integer, nullable=True)
