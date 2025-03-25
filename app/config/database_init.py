@@ -15,7 +15,7 @@ DB_PASSWORD = os.environ.get("DB_PASSWORD")
 SQLALCHEMY_DATABASE_URL = (
     f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
 )
-
+print(SQLALCHEMY_DATABASE_URL)
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -26,5 +26,9 @@ def get_db():
     db = SessionLocal()
     try:
         yield db
+        db.commit()
     except Exception:
+        db.rollback()
+        raise
+    finally:
         db.close()

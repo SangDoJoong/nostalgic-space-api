@@ -8,7 +8,9 @@
 """
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
+
 from config.database_init import Base
+
 
 class User(Base):
     """
@@ -22,6 +24,7 @@ class User(Base):
         created_at (datetime): 사용자 계정 생성일.
         username (str): 사용자 이름.
     """
+
     __tablename__ = "Users"
 
     uid = Column(Integer, primary_key=True)
@@ -45,6 +48,7 @@ class Content(Base):
         like_cnt (int): 콘텐츠 좋아요 수.
         is_deleted (bool): 콘텐츠 삭제 여부.
     """
+
     __tablename__ = "Contents"
 
     contents_id = Column(Integer, primary_key=True)
@@ -67,6 +71,7 @@ class Image(Base):
         image_address (str): 이미지 파일 경로 또는 URL.
         created_at (datetime): 이미지 생성일.
     """
+
     __tablename__ = "Images"
 
     image_id = Column(Integer, primary_key=True)
@@ -85,6 +90,7 @@ class UserImage(Base):
         user_id (int): 사용자 ID.
         image_id (int): 이미지 ID.
     """
+
     __tablename__ = "Users_Images"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, primary_key=False)
@@ -102,6 +108,7 @@ class ContentImage(Base):
         content_id (int): 콘텐츠 ID.
         image_id (int): 이미지 ID.
     """
+
     __tablename__ = "Contents_Images"
     id = Column(Integer, primary_key=True)
     content_id = Column(Integer, primary_key=False)

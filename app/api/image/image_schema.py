@@ -17,6 +17,7 @@ class ImageCreate(BaseModel):
     Attributes:
         image_address (str): 저장된 이미지의 주소.
     """
+
     image_address: str
 
 
@@ -29,6 +30,7 @@ class Token(BaseModel):
         token_type (str): 토큰의 유형 (예: Bearer).
         username (str): 토큰이 발급된 사용자의 이름.
     """
+
     access_token: str
     token_type: str
     username: str
@@ -41,4 +43,5 @@ class ContentImage(BaseModel):
     Attributes:
         content_id (int): 콘텐츠의 고유 ID.
     """
+
     content_id: int
