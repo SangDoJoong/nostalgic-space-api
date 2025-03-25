@@ -7,7 +7,6 @@
     kimdonghyeok
 """
 
-
 import pendulum
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
@@ -18,7 +17,6 @@ from models import Content
 
 
 def create_content(current_user: dict, db: Session, content_create: ContentCreate):
-
     """
     새로운 콘텐츠를 데이터베이스에 생성합니다.
 
@@ -58,7 +56,6 @@ def create_content(current_user: dict, db: Session, content_create: ContentCreat
 
 
 def get_user_content(db: Session, username: str):
-
     """
     특정 사용자가 작성한 콘텐츠 ID 목록을 조회합니다.
 

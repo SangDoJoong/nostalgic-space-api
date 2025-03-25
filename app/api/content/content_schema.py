@@ -59,6 +59,7 @@ class Token(BaseModel):
         access_token (str): 인증에 사용되는 액세스 토큰.
         token_type (str): 토큰 유형 (예: Bearer).
     """
+
     access_token: str
     token_type: str
     # username: str
