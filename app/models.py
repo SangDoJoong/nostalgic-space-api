@@ -7,8 +7,7 @@
     kimdonghyeok
 """
 
-from geoalchemy2 import Geometry
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
 
 from config.database_init import Base
 
@@ -117,45 +116,12 @@ class ContentImage(Base):
 
 
 class Map(Base):
-    """
-    지도 정보를 저장하는 모델 클래스.
-
-    이 클래스는 지도 중심 좌표 정보를 PostGIS의 POINT 타입으로 관리합니다.
-
-    :ivar map_id: 지도 고유 식별자 (자동 증가, 기본키).
-    :ivar center_location: 지도 중심 좌표를 저장하는 컬럼. PostGIS의 POINT 타입을 사용.
-    """
-
     __tablename__ = "maps"
-    map_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    # 지도 중심 좌표 (PostGIS 사용)
-    center_location = Column(Geometry(geometry_type="POINT", srid=4326), nullable=False)
 
-
-class Marker(Base):
-    """
-    지도에 표시되는 마커 정보를 저장하는 모델 클래스.
-
-    이 클래스는 각 마커의 위치 정보와 추가 메타데이터(사용자 ID, 콘텐츠 ID 등)를 관리합니다.
-    마커는 특정 지도에 소속되며, 지도와의 외래키 관계를 유지합니다.
-
-    :ivar marker_id: 마커 고유 식별자 (자동 증가, 기본키).
-    :ivar map_id: 마커가 속한 지도 ID. 'maps' 테이블의 외래키.
-    :ivar latitude: 마커의 위도 값.
-    :ivar longitude: 마커의 경도 값.
-    :ivar location: 마커 위치 정보를 저장하는 컬럼. PostGIS의 POINT 타입을 사용.
-    :ivar uid: 마커와 관련된 사용자 ID (옵션).
-    :ivar content_id: 마커와 관련된 콘텐츠 ID (옵션).
-    """
-
-    __tablename__ = "markers"
-    marker_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    map_id = Column(
-        Integer, ForeignKey("maps.map_id", ondelete="CASCADE"), nullable=False
-    )
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
-    # 마커 위치 (PostGIS geometry)
-    location = Column(Geometry(geometry_type="POINT", srid=4326), nullable=False)
-    uid = Column(Integer, nullable=True)
-    content_id = Column(Integer, nullable=True)
+    map_id = Column(Integer, primary_key=True, autoincrement=True)
+    # TODO: content_id를 외래키로 설정해야 함
+    # content_id = Column(Integer, ForeignKey("Content.contents_id"), nullable=False)
+    content_id = Column(Integer, nullable=False)
+    latitude = Column(Float, nullable=False)  # 위도
+    longitude = Column(Float, nullable=False)  # 경도
+    created_at = Column(DateTime, nullable=False)
