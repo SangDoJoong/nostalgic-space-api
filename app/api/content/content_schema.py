@@ -14,7 +14,12 @@ from pydantic import BaseModel, validator
 from starlette import status
 
 
-class ContentCreate(BaseModel):
+class BaseOrmModel(BaseModel):
+    class Config:
+        orm_mode = True
+
+
+class ContentCreate(BaseOrmModel):
     """
     콘텐츠 생성 요청 데이터 모델.
 
@@ -51,7 +56,7 @@ class ContentCreate(BaseModel):
         return v
 
 
-class Token(BaseModel):
+class Token(BaseOrmModel):
     """
     인증 토큰 데이터 모델.
 

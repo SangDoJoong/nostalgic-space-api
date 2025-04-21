@@ -10,7 +10,12 @@
 from pydantic import BaseModel
 
 
-class ImageCreate(BaseModel):
+class BaseOrmModel(BaseModel):
+    class Config:
+        orm_mode = True
+
+
+class ImageCreate(BaseOrmModel):
     """
     이미지 생성 요청 데이터 모델.
 
@@ -21,7 +26,7 @@ class ImageCreate(BaseModel):
     image_address: str
 
 
-class Token(BaseModel):
+class Token(BaseOrmModel):
     """
     인증 토큰 데이터 모델.
 
@@ -36,7 +41,7 @@ class Token(BaseModel):
     username: str
 
 
-class ContentImage(BaseModel):
+class ContentImage(BaseOrmModel):
     """
     콘텐츠-이미지 관계 데이터 모델.
 

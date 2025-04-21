@@ -12,7 +12,12 @@ from pydantic import BaseModel, validator
 from starlette import status
 
 
-class UserCreate(BaseModel):
+class BaseOrmModel(BaseModel):
+    class Config:
+        orm_mode = True
+
+
+class UserCreate(BaseOrmModel):
     """
     사용자 생성 요청 데이터 모델.
 
@@ -74,7 +79,7 @@ class UserCreate(BaseModel):
         return v
 
 
-class Token(BaseModel):
+class Token(BaseOrmModel):
     """
     인증 토큰 데이터 모델.
 

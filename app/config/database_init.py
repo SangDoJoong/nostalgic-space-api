@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlmodel import SQLModel
 
 load_dotenv()
 
@@ -32,3 +33,13 @@ def get_db():
         raise
     finally:
         db.close()
+
+
+def conn():
+    # DB에 연결하여 선언된 테이블들이 존재하는지 확인하고
+    # 없다면 테이블들을 생성해준다.
+    try:
+        SQLModel.metadata.create_all(engine)
+    except Exception as e:
+        print(f"Error creating database tables: {e}")
+        raise
