@@ -7,6 +7,7 @@ __pycache__
 ## venv
 /.venv
 venv
+.venv/
 
 ## env
 secret.env
@@ -15,7 +16,8 @@ secret.env
 ## etc
 .DS_Store
 .vscode
-.pythoin-version
+.python-version
+Python
 
 ## key
 *.key
