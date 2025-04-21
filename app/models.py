@@ -7,121 +7,62 @@
     kimdonghyeok
 """
 
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
+from datetime import datetime
+from typing import Optional
 
-from config.database_init import Base
+from sqlmodel import Field, SQLModel
 
 
-class User(Base):
-    """
-    사용자 모델.
-
-    데이터베이스에 저장될 사용자 정보를 나타냅니다.
-
-    Attributes:
-        uid (int): 사용자 고유 식별자.
-        password (str): 사용자 비밀번호.
-        created_at (datetime): 사용자 계정 생성일.
-        username (str): 사용자 이름.
-    """
-
+class User(SQLModel, table=True):
     __tablename__ = "Users"
 
-    uid = Column(Integer, primary_key=True)
-    password = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    username = Column(String, nullable=False)
+    uid: int | None = Field(default=None, primary_key=True)
+    password: str = Field(..., nullable=False)
+    created_at: datetime = Field(..., nullable=False)
+    username: str = Field(..., nullable=False)
 
 
-class Content(Base):
-    """
-    콘텐츠 모델.
-
-    데이터베이스에 저장될 콘텐츠 정보를 나타냅니다.
-
-    Attributes:
-        contents_id (int): 콘텐츠 고유 식별자.
-        title (str): 콘텐츠 제목.
-        content (str): 콘텐츠 내용.
-        writer_name (str): 작성자 이름.
-        created_at (datetime): 콘텐츠 생성일.
-        like_cnt (int): 콘텐츠 좋아요 수.
-        is_deleted (bool): 콘텐츠 삭제 여부.
-    """
-
+class Content(SQLModel, table=True):
     __tablename__ = "Contents"
 
-    contents_id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=True)
-    content = Column(String, nullable=True)
-    writer_name = Column(String, primary_key=False)
-    created_at = Column(DateTime, nullable=False)
-    like_cnt = Column(Integer, nullable=False)
-    is_deleted = Column(Boolean, nullable=False)
+    contents_id: int | None = Field(default=None, primary_key=True)
+    title: Optional[str] = Field(default=None, nullable=True)
+    content: Optional[str] = Field(default=None, nullable=True)
+    writer_name: Optional[str] = Field(default=None, nullable=True)
+    created_at: datetime = Field(..., nullable=False)
+    like_cnt: int = Field(..., nullable=False)
+    is_deleted: bool = Field(..., nullable=False)
+    map_id: Optional[int] = Field(default=None, foreign_key="maps.map_id")
 
 
-class Image(Base):
-    """
-    이미지 모델.
-
-    데이터베이스에 저장될 이미지 정보를 나타냅니다.
-
-    Attributes:
-        image_id (int): 이미지 고유 식별자.
-        image_address (str): 이미지 파일 경로 또는 URL.
-        created_at (datetime): 이미지 생성일.
-    """
-
+class Image(SQLModel, table=True):
     __tablename__ = "Images"
 
-    image_id = Column(Integer, primary_key=True)
-    image_address = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False)
+    image_id: int | None = Field(default=None, primary_key=True)
+    image_address: str = Field(..., nullable=False)
+    created_at: datetime = Field(..., nullable=False)
 
 
-class UserImage(Base):
-    """
-    사용자-이미지 관계 모델.
-
-    사용자가 업로드한 이미지와의 관계를 나타냅니다.
-
-    Attributes:
-        id (int): 고유 식별자.
-        user_id (int): 사용자 ID.
-        image_id (int): 이미지 ID.
-    """
-
+class UserImage(SQLModel, table=True):
     __tablename__ = "Users_Images"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, primary_key=False)
-    image_id = Column(Integer, primary_key=False)
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(..., nullable=False)
+    image_id: int = Field(..., nullable=False)
 
 
-class ContentImage(Base):
-    """
-    콘텐츠-이미지 관계 모델.
-
-    콘텐츠와 첨부된 이미지 간의 관계를 나타냅니다.
-
-    Attributes:
-        id (int): 고유 식별자.
-        content_id (int): 콘텐츠 ID.
-        image_id (int): 이미지 ID.
-    """
-
+class ContentImage(SQLModel, table=True):
     __tablename__ = "Contents_Images"
-    id = Column(Integer, primary_key=True)
-    content_id = Column(Integer, primary_key=False)
-    image_id = Column(Integer, primary_key=False)
+
+    id: int | None = Field(default=None, primary_key=True)
+    content_id: int = Field(..., nullable=False)
+    image_id: int = Field(..., nullable=False)
 
 
-class Map(Base):
+class Map(SQLModel, table=True):
     __tablename__ = "maps"
 
-    map_id = Column(Integer, primary_key=True, autoincrement=True)
-    # TODO: content_id를 외래키로 설정해야 함
-    # content_id = Column(Integer, ForeignKey("Content.contents_id"), nullable=False)
-    content_id = Column(Integer, nullable=False)
-    latitude = Column(Float, nullable=False)  # 위도
-    longitude = Column(Float, nullable=False)  # 경도
-    created_at = Column(DateTime, nullable=False)
+    map_id: int | None = Field(default=None, primary_key=True)
+    latitude: float = Field(..., nullable=False)
+    longitude: float = Field(..., nullable=False)
+    created_at: datetime = Field(..., nullable=False)

@@ -14,6 +14,8 @@ from api.image import image_router
 from api.map import map_router
 from api.user import user_router
 from config import docs_security
+
+# from config.database_init import conn
 from config.settings import Settings
 
 # Load environment variables
@@ -91,3 +93,9 @@ if __name__ == "__main__":
     settings = Settings()
 
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+# DB 연결
+# @app.on_event("startup")
+# def on_startup():
+#     # connetion.py에 선언해준 conn함수를 실행시켜 DB를 연결해준다.
+#     conn()
