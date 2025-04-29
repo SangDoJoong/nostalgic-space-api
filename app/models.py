@@ -7,7 +7,8 @@
     kimdonghyeok
 """
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from geoalchemy2 import Geometry
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
 
 from config.database_init import Base
 
@@ -113,3 +114,21 @@ class ContentImage(Base):
     id = Column(Integer, primary_key=True)
     content_id = Column(Integer, primary_key=False)
     image_id = Column(Integer, primary_key=False)
+
+
+class map_marker(Base):
+    """
+    지도 마커 정보를 저장하는 모델.
+
+    속성:
+        map_id (int): 마커의 고유 ID.
+        latitude (float): 마커의 위도.
+        longitude (float): 마커의 경도.
+        location (Geometry): 마커의 위치를 나타내는 포인트 형태의 지오메트리.
+    """
+
+    __tablename__ = "map_marker"
+    map_id = Column(Integer, primary_key=True)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    location = Column(Geometry("POINT"), nullable=False)

@@ -86,8 +86,8 @@ def create_userimage(db: Session, image_create: ImageCreate, username: str):
         db.commit()
         return db_image.image_id
     except SQLAlchemyError as e:
-        db.rollback()
-        print(f"An error occurred: {e}")
+        db.rollback()  # 데이터베이스 롤백
+        print(f"An error occurred: {e}")  # 오류 메시지 출력 또는 로깅
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
