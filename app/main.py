@@ -11,6 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from api.content import content_router
 from api.image import image_router
+from api.map import map_router
 from api.user import user_router
 from config import docs_security
 from config.settings import Settings
@@ -78,6 +79,8 @@ async def get_redoc() -> HTMLResponse:
 app.include_router(user_router.router)
 app.include_router(content_router.router)
 app.include_router(image_router.router)
+app.include_router(map_router.router)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

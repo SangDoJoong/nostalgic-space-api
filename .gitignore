@@ -11,10 +11,12 @@ venv
 ## env
 secret.env
 .env
+.env.*
 
 ## etc
 .DS_Store
 .vscode
+.pythoin-version
 
 ## key
 *.key
