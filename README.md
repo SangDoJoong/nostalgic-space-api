@@ -13,6 +13,22 @@ pre-commit install
 pre-commit run --all-files
 ```
 
+### poetry
+```bash
+# poetry 설치
+pip install poetry
+poetry install
+
+poetry self add poetry-plugin-shell
+poetry shell
+
+# poetry add package
+poetry add <package_name>
+
+# poetry lock
+poetry lock
+```
+
 ### Run
 ```bash
 pip install -r requirements.txt
