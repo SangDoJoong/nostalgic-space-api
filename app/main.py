@@ -11,6 +11,7 @@ from api.image import image_router
 from api.map import map_router
 from api.user import user_router
 from app.api import base_router
+from app.config.events import shutdown, startup
 from config import docs_security
 
 # from config.database_init import conn
@@ -41,6 +42,9 @@ app.include_router(user_router.router)
 app.include_router(content_router.router)
 app.include_router(image_router.router)
 app.include_router(map_router.router)
+
+app.add_event_handler("startup", startup)
+app.add_event_handler("shutdown", shutdown)
 
 
 if __name__ == "__main__":
