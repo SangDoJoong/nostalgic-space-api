@@ -1,16 +1,14 @@
 import base64
-import os
 import secrets
 
-from dotenv import load_dotenv
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
-load_dotenv()
+from config.settings import settings
 
-secret_name = os.environ.get("SWAGGER_NAME")
-secret_password = os.environ.get("SWAGGER_PASSWORD")
+secret_name = settings.SWAGGER_NAME
+secret_password = settings.SWAGGER_PASSWORD
 
 
 class ApidocBasicAuthMiddleware(BaseHTTPMiddleware):
