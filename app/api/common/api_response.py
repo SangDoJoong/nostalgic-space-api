@@ -1,12 +1,12 @@
 from typing import Generic, Optional, TypeVar
 
 from fastapi import status
-from pydantic.generics import GenericModel
+from pydantic import BaseModel
 
 T = TypeVar("T")
 
 
-class ApiResponse(GenericModel, Generic[T]):
+class ApiResponse(BaseModel, Generic[T]):
     status_code: int = status.HTTP_200_OK
     detail: str = "요청이 정상적으로 처리되었습니다."
     data: Optional[T] = None

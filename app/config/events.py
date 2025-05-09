@@ -1,4 +1,4 @@
-from app.config.database_init import conn
+from config.database_init import conn
 
 
 async def startup():

@@ -1,6 +1,4 @@
-import os
-
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -14,5 +12,4 @@ class Settings(BaseSettings):
     SWAGGER_NAME: str
     SWAGGER_PASSWORD: str
 
-    class Config:
-        env_file = f".env.{os.getenv('APP_ENV', 'local')}"
+    model_config = SettingsConfigDict(env_file=".env.local")
