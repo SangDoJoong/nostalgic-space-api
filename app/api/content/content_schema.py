@@ -10,13 +10,13 @@ Pydantic 스키마 정의 모듈.
 from typing import List
 
 from fastapi import HTTPException
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 from starlette import status
 
 
 class BaseOrmModel(BaseModel):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ContentCreate(BaseOrmModel):
@@ -33,7 +33,7 @@ class ContentCreate(BaseOrmModel):
     content: str
     image_id: List
 
-    @validator("content", "title", pre=True, always=True)
+    @field_validator("content", "title")
     def not_empty(cls, v, field):
         """
         콘텐츠와 제목 필드가 비어 있지 않은지 확인하는 유효성 검사기.
