@@ -8,7 +8,6 @@
 """
 
 import pendulum
-from dotenv import load_dotenv
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -18,8 +17,6 @@ from models.content_image import ContentImage
 from models.image import Image
 from models.user import User
 from models.user_image import UserImage
-
-load_dotenv()
 
 
 def create_contentimage(db: Session, image_create: ImageCreate):

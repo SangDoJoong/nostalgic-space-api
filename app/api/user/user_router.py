@@ -60,7 +60,6 @@ def login_for_access_token(
     Raises:
         HTTPException: 인증 실패 시 401 상태 코드 반환.
     """
-    print("----접근~~")
     user = user_service.get_user(db, _login_request_dto)
     access_token = user_service.get_access_token(user)
 
