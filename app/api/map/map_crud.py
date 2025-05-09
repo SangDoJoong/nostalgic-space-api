@@ -3,7 +3,8 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from models import Content, Map
+from models.content import Content
+from models.map import Map
 
 from .map_schema import MapCreate
 
