@@ -19,7 +19,7 @@ from api.common.jwt import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from api.common.pwd_context import pwd_context
 from api.user.dto.login_request_dto import LoginRequestDto
 from api.user.user_schema import UserCreate
-from models import User
+from models.user import User
 
 
 def create_user(db: Session, user_create: UserCreate):

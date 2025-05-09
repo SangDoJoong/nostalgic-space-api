@@ -6,13 +6,13 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api import base_router
 from api.content import content_router
 from api.image import image_router
 from api.map import map_router
 from api.user import user_router
-from app.api import base_router
-from app.config.events import shutdown, startup
 from config import docs_security
+from config.events import shutdown, startup
 
 # from config.database_init import conn
 from config.settings import Settings
