@@ -7,16 +7,19 @@
     kimdonghyeok
 """
 
+from datetime import datetime, timedelta
+
 import pendulum
 from fastapi import HTTPException
-from passlib.context import CryptContext
-from sqlalchemy.exc import SQLAlchemyError
+from jose import jwt
 from sqlalchemy.orm import Session
+from starlette import status
 
+from api.common.jwt import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
+from api.common.pwd_context import pwd_context
+from api.user.dto.login_request_dto import LoginRequestDto
 from api.user.user_schema import UserCreate
 from models import User
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def create_user(db: Session, user_create: UserCreate):
@@ -33,21 +36,16 @@ def create_user(db: Session, user_create: UserCreate):
     Raises:
         HTTPException: 데이터베이스 작업 중 오류가 발생한 경우.
     """
-    try:
-        db_user = User(
-            username=user_create.username,
-            password=pwd_context.hash(user_create.password1),
-            created_at=pendulum.now("Asia/Seoul"),
-        )
-        db.add(db_user)
-        db.commit()
-        db.refresh(db_user)  # db_user 객체를 갱신하여 반환
-        return db_user
-    except SQLAlchemyError as e:
-        db.rollback()  # 오류 발생 시 롤백
-        error_msg = f"An error occurred while creating the user: {str(e)}"
-        print(error_msg)  # 오류 메시지를 콘솔에 출력
-        raise HTTPException(status_code=500, detail=error_msg)
+    get_existing_user(db, user_create=user_create)
+    db_user = User(
+        username=user_create.username,
+        password=pwd_context.hash(user_create.password1),
+        created_at=pendulum.now("Asia/Seoul"),
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)  # db_user 객체를 갱신하여 반환
+    return db_user
 
 
 def get_existing_user(db: Session, user_create: UserCreate):
@@ -61,10 +59,14 @@ def get_existing_user(db: Session, user_create: UserCreate):
     Returns:
         User or None: 사용자 객체 또는 존재하지 않을 경우 None.
     """
-    return db.query(User).filter(User.username == user_create.username).first()
+    user = db.query(User).filter(User.username == user_create.username).first()
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="이미 존재하는 사용자입니다."
+        )
 
 
-def get_user(db: Session, username: str):
+def get_user(db: Session, _login_request_dto: LoginRequestDto):
     """
     사용자 이름으로 사용자를 조회합니다.
 
@@ -75,4 +77,21 @@ def get_user(db: Session, username: str):
     Returns:
         User or None: 사용자 객체 또는 존재하지 않을 경우 None.
     """
-    return db.query(User).filter(User.username == username).first()
+    user = db.query(User).filter(User.username == _login_request_dto.username).first()
+    if not user or not pwd_context.verify(_login_request_dto.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="아이디 혹은 패스워드가 일치하지 않습니다.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
+
+
+def get_access_token(user):
+    data = {
+        "sub": user.username,
+        "exp": datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    }
+
+    access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+    return access_token

@@ -11,7 +11,30 @@ POST {{backend_api}}/api/user/create
 Content-Type: application/json
 
 {
-  "username": "test",
+  "username": "test11111",
   "password1": "1234",
   "password2": "1234"
 }
+
+### 로그인
+POST {{backend_api}}/api/user/login
+Content-Type: application/json
+
+{
+  "username": "test11",
+  "password": "1234"
+}
+
+### 토큰
+POST {{backend_api}}/api/user/token
+Content-Type: application/json
+
+{
+  "username": "test11",
+  "password": "1234"
+}
+
+### 유저 조회
+GET {{backend_api}}/api/user/me
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0MTEiLCJleHAiOjE3NDMwMDc0MzJ9.tx7SvmPDTEdO4Get9WMSskjAEPGDd-2Scj17Vx9sfNg

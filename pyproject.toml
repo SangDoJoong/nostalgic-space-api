@@ -1,2 +1,32 @@
 [tool.isort]
 src_paths=["app"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.poetry]
+name = "your-project-name"
+version = "0.1.0"
+description = "A short description of your project"
+authors = ["Your Name <youremail@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = ">=0.68.0,<0.69.0"
+pydantic = ">=1.8.0,<2.0.0"
+uvicorn = ">=0.15.0,<0.16.0"
+python-dotenv = "1.0.0"
+sqlalchemy = "2.0.25"
+python-jose = "3.3.0"
+passlib = "1.7.4"
+python-multipart = "0.0.5"
+bcrypt = "4.0.1"
+pendulum = "3.0.0"
+sqlmodel = "*"
+psycopg2 = "*"
+
+[tool.poetry.dev-dependencies]
+pre-commit = "~3.8.0"
+poetry = "^2.1.3"
