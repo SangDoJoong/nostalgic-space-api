@@ -13,8 +13,9 @@ from starlette import status
 
 from api.common.api_response import ApiResponse
 from api.common.jwt import get_current_user
-from api.user import user_crud, user_schema
-from api.user.dto.login_request_dto import LoginRequestDto
+from api.user import user_service
+from api.user.schema.login_request_schema import LoginRequestDto
+from api.user.schema.user_create_schema import UserCreate
 from config.database_init import get_db
 
 router = APIRouter(
@@ -23,7 +24,7 @@ router = APIRouter(
 
 
 @router.post("/create", status_code=status.HTTP_200_OK)
-def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_db)):
+def user_create(_user_create: UserCreate, db: Session = Depends(get_db)):
     """
     새로운 사용자를 생성합니다.
 
@@ -37,7 +38,7 @@ def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_
     Raises:
         HTTPException: 사용자가 이미 존재할 경우 409 상태 코드 반환.
     """
-    user_crud.create_user(db=db, user_create=_user_create)
+    user_service.create_user(db=db, user_create=_user_create)
 
     return ApiResponse.ok()
 
@@ -59,8 +60,8 @@ def login_for_access_token(
     Raises:
         HTTPException: 인증 실패 시 401 상태 코드 반환.
     """
-    user = user_crud.get_user(db, _login_request_dto)
-    access_token = user_crud.get_access_token(user)
+    user = user_service.get_user(db, _login_request_dto)
+    access_token = user_service.get_access_token(user)
 
     return ApiResponse.success(access_token)
 
@@ -82,8 +83,8 @@ def login_for_access_token_with_token(
     Raises:
         HTTPException: 인증 실패 시 401 상태 코드 반환.
     """
-    user = user_crud.get_user(db, _login_request_dto)
-    access_token = user_crud.get_access_token(user)
+    user = user_service.get_user(db, _login_request_dto)
+    access_token = user_service.get_access_token(user)
 
     return ApiResponse.success(access_token)
 

@@ -32,5 +32,5 @@ poetry lock
 ### Run
 ```bash
 pip install -r requirements.txt
-python main.py --APP_ENV=dev
+APP_ENV=dev python app/main.py
 ```

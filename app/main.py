@@ -1,101 +1,50 @@
-import argparse
-import os
-
 import uvicorn
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
-from fastapi.openapi.utils import get_openapi
-from fastapi.responses import HTMLResponse, JSONResponse
 
+from api import base_router
 from api.content import content_router
 from api.image import image_router
 from api.map import map_router
 from api.user import user_router
 from config import docs_security
+from config.events import shutdown, startup
+from config.settings import settings
 
-# from config.database_init import conn
-from config.settings import Settings
-
-# Load environment variables
-load_dotenv()
-
-app = FastAPI()
-
-app.add_middleware(docs_security.ApidocBasicAuthMiddleware)
-
-# Set CORS origins from environment variable
-origins = os.getenv("CORS_ORIGINS", "").split(",")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = None
 
 
-@app.get(
-    "/ping",
-)
-async def ping() -> JSONResponse:
-    return JSONResponse(content={"message": "pong"})
+def create_app() -> FastAPI:
+    app = FastAPI()
 
+    # 보안 문서 미들웨어
+    app.add_middleware(docs_security.ApidocBasicAuthMiddleware)
 
-@app.get("/env")
-async def root():
-    return {"app_env": settings}
+    # CORS 설정
+    origins = settings.CORS_ORIGINS.split(",")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
+    # 라우터 등록
+    app.include_router(base_router.router)
+    app.include_router(user_router.router)
+    app.include_router(content_router.router)
+    app.include_router(image_router.router)
+    app.include_router(map_router.router)
 
-@app.get(
-    "/docs",
-    tags=["documentation"],
-    include_in_schema=False,
-)
-async def get_swagger_documentation() -> HTMLResponse:
-    return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
+    # 이벤트 핸들러 등록
+    app.add_event_handler("startup", startup)
+    app.add_event_handler("shutdown", shutdown)
 
-
-@app.get(
-    "/openapi.json",
-    tags=["documentation"],
-    include_in_schema=False,
-)
-async def openapi() -> JSONResponse:
-    openapi_schema = get_openapi(title="FastAPI", version="0.1.0", routes=app.routes)
-    return JSONResponse(content=openapi_schema)
-
-
-@app.get(
-    "/redoc",
-    tags=["documentation"],
-    include_in_schema=False,
-)
-async def get_redoc() -> HTMLResponse:
-    return get_redoc_html(openapi_url="/openapi.json", title="docs")
-
-
-# Include routers
-app.include_router(user_router.router)
-app.include_router(content_router.router)
-app.include_router(image_router.router)
-app.include_router(map_router.router)
+    return app
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-env", "--APP_ENV", type=str, default="local")
-    args = parser.parse_args()
+    app = create_app()
 
-    os.environ["APP_ENV"] = args.APP_ENV
-    settings = Settings()
-
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-
-# DB 연결
-# @app.on_event("startup")
-# def on_startup():
-#     # connetion.py에 선언해준 conn함수를 실행시켜 DB를 연결해준다.
-#     conn()
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)

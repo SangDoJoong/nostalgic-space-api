@@ -1,12 +1,12 @@
-import os
-
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from starlette import status
 
+from config.settings import settings
+
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/token")

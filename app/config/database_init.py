@@ -1,17 +1,14 @@
-import os
-
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 
-load_dotenv()
+from config.settings import settings
 
-DB_HOST = os.environ.get("DB_HOST")
-DB_NAME = os.environ.get("DB_NAME")
-DB_USERNAME = os.environ.get("DB_USERNAME")
-DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_HOST = settings.DB_HOST
+DB_NAME = settings.DB_NAME
+DB_USERNAME = settings.DB_USERNAME
+DB_PASSWORD = settings.DB_PASSWORD
 
 SQLALCHEMY_DATABASE_URL = (
     f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"

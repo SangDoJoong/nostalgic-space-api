@@ -8,15 +8,15 @@
 """
 
 import pendulum
-from dotenv import load_dotenv
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from api.image.image_schema import ImageCreate
-from models import ContentImage, Image, User, UserImage
-
-load_dotenv()
+from models.content_image import ContentImage
+from models.image import Image
+from models.user import User
+from models.user_image import UserImage
 
 
 def create_contentimage(db: Session, image_create: ImageCreate):
