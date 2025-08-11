@@ -11,8 +11,6 @@ from config import docs_security
 from config.events import shutdown, startup
 from config.settings import settings
 
-app = None
-
 
 def create_app() -> FastAPI:
     app = FastAPI()
