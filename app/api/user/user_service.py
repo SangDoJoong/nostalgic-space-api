@@ -9,9 +9,9 @@
 
 from datetime import datetime, timedelta
 
+import jwt
 import pendulum
 from fastapi import HTTPException
-from jose import jwt
 from sqlalchemy.orm import Session
 from starlette import status
 

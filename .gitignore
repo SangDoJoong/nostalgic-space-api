@@ -17,7 +17,6 @@ secret.env
 ## etc
 .DS_Store
 .vscode
-.python-version
 Python
 
 ## key
