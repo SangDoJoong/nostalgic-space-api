@@ -1,6 +1,6 @@
+import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from starlette import status
 
 from config.settings import settings
@@ -26,7 +26,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
 
         token_data = {"username": username}
-    except JWTError:
+    except jwt.InvalidTokenError:
         raise credentials_exception
     else:
         return token_data
