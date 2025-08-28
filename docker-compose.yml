@@ -43,7 +43,7 @@ services:
     links:
       - db
     volumes:
-      - ./app:/code/app
+      - ./app:/app/app
       - /home/ubuntu/uploads:/uploads
     networks:
       - backend

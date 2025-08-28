@@ -12,143 +12,138 @@ from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from api.image.image_schema import ImageCreate
-from models.content_image import ContentImage
-from models.image import Image
-from models.user import User
-from models.user_image import UserImage
+import app.models.content as content
+import app.models.image as image
+import app.models.user as user
+
+# ---------------------- #
+#   User Profile Image   #
+# ---------------------- #
 
 
-def create_contentimage(db: Session, image_create: ImageCreate):
+def create_userimage(db: Session, image_path: str, username: str) -> int:
     """
-    콘텐츠와 연결된 이미지를 생성합니다.
+    사용자의 프로필 이미지를 생성하거나 교체
 
-    Args:
-        db (Session): SQLAlchemy 데이터베이스 세션.
-        image_create (ImageCreate): 생성할 이미지의 데이터.
-
-    Returns:
-        int: 생성된 이미지의 고유 ID.
-
-    Raises:
-        HTTPException: 데이터베이스 작업 중 오류가 발생한 경우.
     """
     try:
-        db_image = Image(
-            created_at=pendulum.now("Asia/Seoul"),
-            image_address=image_create.image_address,
-        )
-        db.add(db_image)
-        db.commit()
-        return db_image.image_id
-    except SQLAlchemyError as e:
-        db.rollback()  # 데이터베이스 롤백
-        print(f"An error occurred: {e}")  # 오류 메시지 출력 또는 로깅
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        user_obj = db.query(user.User).filter(user.User.username == username).first()
+        if not user_obj:
+            raise HTTPException(status_code=404, detail="User not found")
 
-
-def create_userimage(db: Session, image_create: ImageCreate, username: str):
-    """
-    사용자의 이미지를 생성하거나 업데이트합니다.
-
-    Args:
-        db (Session): SQLAlchemy 데이터베이스 세션.
-        image_create (ImageCreate): 생성할 이미지의 데이터.
-        username (str): 이미지를 연결할 사용자 이름.
-
-    Returns:
-        int: 생성 또는 업데이트된 이미지의 고유 ID.
-
-    Raises:
-        HTTPException: 데이터베이스 작업 중 오류가 발생한 경우.
-    """
-    try:
-        user_id = db.query(User).filter(User.username == username).first().uid
-        # 사용자가 기존에 이미지를 가지고 있는지 확인
-        existing_user_image = (
-            db.query(UserImage).filter(UserImage.user_id == user_id).first()
-        )
-        # image db 에 이미지 저장 정보 저장
-        db_image = Image(
-            created_at=pendulum.now("Asia/Seoul"),
-            image_address=image_create.image_address,
+        # 새로운 이미지 생성
+        db_image = image.Image(
+            created_at=pendulum.now("Asia/Seoul"), image_address=image_path
         )
         db.add(db_image)
         db.flush()
-        if existing_user_image:
-            # 사용자가 기존 이미지를 가지고 있다면 해당 이미지 정보를 업데이트
-            existing_user_image.image_id = db_image.image_id
-            db.add(existing_user_image)
-        else:
-            # 사용자가 기존 이미지를 가지고 있지 않다면 새로운 UserImage 관계를 추가
-            user_image = UserImage(user_id=user_id, image_id=db_image.image_id)
-            db.add(user_image)
+
+        # 기존 이미지 있으면 삭제
+        if user_obj.profile_image_id:
+            old = (
+                db.query(image.Image)
+                .filter(image.Image.id == user_obj.profile_image_id)
+                .first()
+            )
+            if old:
+                db.delete(old)
+
+        # 유저 프로필 이미지 갱신
+        user_obj.profile_image_id = db_image.id
+        db.add(user_obj)
         db.commit()
-        return db_image.image_id
+        db.refresh(db_image)
+        return db_image.id
+
     except SQLAlchemyError as e:
-        db.rollback()  # 데이터베이스 롤백
-        print(f"An error occurred: {e}")  # 오류 메시지 출력 또는 로깅
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        db.rollback()
+        print(f"[create_userimage] {e}")
+        raise HTTPException(status_code=500, detail="DB Error")
 
 
 def get_user_image(db: Session, username: str):
-    """
-    특정 사용자의 이미지 주소를 조회합니다.
+    """사용자의 프로필 이미지 조회"""
+    user_obj = db.query(user.User).filter(user.User.username == username).first()
+    if not user_obj or not user_obj.profile_image_id:
+        return None
+    return user_obj.profile_image
 
-    Args:
-        db (Session): SQLAlchemy 데이터베이스 세션.
-        username (str): 조회할 사용자 이름.
 
-    Returns:
-        str: 사용자의 이미지 주소.
-
-    Raises:
-        HTTPException: 데이터베이스 작업 중 오류가 발생한 경우.
-    """
+def delete_user_image(db: Session, username: str) -> bool:
+    """사용자의 프로필 이미지 삭제"""
     try:
-        user_image_id = db.query(User).filter(User.username == username).first().uid
-        image_id = (
-            db.query(UserImage)
-            .filter(UserImage.user_id == user_image_id)
+        user_obj = db.query(user.User).filter(user.User.username == username).first()
+        if not user_obj or not user_obj.profile_image_id:
+            raise HTTPException(status_code=404, detail="User image not found")
+
+        img = (
+            db.query(image.Image)
+            .filter(image.Image.id == user_obj.profile_image_id)
             .first()
-            .image_id
         )
-        image_address = (
-            db.query(Image).filter(Image.image_id == image_id).first().image_address
-        )
-        return image_address
+        if img:
+            db.delete(img)
+        user_obj.profile_image_id = None
+        db.add(user_obj)
+        db.commit()
+        return True
     except SQLAlchemyError as e:
-        db.rollback()  # 데이터베이스 롤백
-        print(f"An error occurred: {e}")  # 오류 메시지 출력 또는 로깅
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        db.rollback()
+        print(f"[delete_user_image] {e}")
+        raise HTTPException(status_code=500, detail="DB Error")
 
 
-def get_content_image(db: Session, content_id: str):
-    """
-    특정 콘텐츠와 연결된 모든 이미지 주소를 조회합니다.
+# ---------------------- #
+#   Content Images (N:1) #
+# ---------------------- #
 
-    Args:
-        db (Session): SQLAlchemy 데이터베이스 세션.
-        content_id (str): 조회할 콘텐츠의 고유 ID.
 
-    Returns:
-        list: 콘텐츠와 연결된 이미지 주소 목록.
-
-    Raises:
-        HTTPException: 데이터베이스 작업 중 오류가 발생한 경우.
-    """
+def create_contentimage(db: Session, image_path: str, content_id: int) -> int:
+    """콘텐츠 이미지 생성"""
     try:
-        image_address = []
-        results = (
-            db.query(ContentImage).filter(ContentImage.content_id == content_id).all()
+        content_obj = (
+            db.query(content.Content).filter(content.Content.id == content_id).first()
         )
-        for result in results:
-            image_id = result.image_id
-            image_address.append(
-                db.query(Image).filter(Image.image_id == image_id).first().image_address
-            )
-        return image_address
+        if not content_obj:
+            raise HTTPException(status_code=404, detail="Content not found")
+
+        db_image = image.Image(
+            created_at=pendulum.now("Asia/Seoul"),
+            image_address=image_path,
+            content_id=content_id,
+        )
+        db.add(db_image)
+        db.commit()
+        db.refresh(db_image)
+        return db_image.id
     except SQLAlchemyError as e:
-        db.rollback()  # 데이터베이스 롤백
-        print(f"An error occurred: {e}")  # 오류 메시지 출력 또는 로깅
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        db.rollback()
+        print(f"[create_contentimage] {e}")
+        raise HTTPException(status_code=500, detail="DB Error")
+
+
+def get_content_images(db: Session, content_id: int):
+    """콘텐츠의 모든 이미지 조회"""
+    content_obj = (
+        db.query(content.Content).filter(content.Content.id == content_id).first()
+    )
+    if not content_obj:
+        return []
+    return content_obj.images
+
+
+def delete_content_images(db: Session, content_id: int) -> bool:
+    """콘텐츠의 모든 이미지 삭제 (개별 삭제 불가)"""
+    try:
+        imgs = db.query(image.Image).filter(image.Image.content_id == content_id).all()
+        if not imgs:
+            raise HTTPException(status_code=404, detail="No images found")
+
+        for img in imgs:
+            db.delete(img)
+        db.commit()
+        return True
+    except SQLAlchemyError as e:
+        db.rollback()
+        print(f"[delete_content_images] {e}")
+        raise HTTPException(status_code=500, detail="DB Error")
