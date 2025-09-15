@@ -3,12 +3,13 @@ version: '3'
 services:
   # 서비스 명
   db:
-    # 사용할 이미지
-    image: sangdo_postgis:0.1
+    # Build info
+    build:
+      context: docker/sangdo_postgis
     # 컨테이너 실행 시 재시작
-    restart: always
+    restart: on-failure
     # 컨테이너명 설정
-    container_name: postgres
+    container_name: sangdo_postgis
     # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
     ports:
       - '5432:5432'
@@ -24,16 +25,25 @@ services:
       - backend
 
   fastapi:
-    image: sangdo_fastapi:0.2
-    command: python main.py --APP_ENV=dev
+    # Build info
+    build:
+      context: .
+      dockerfile: docker/sangdo_api_server/Dockerfile
+      # 컨테이너 실행 시 재시작
+    restart: on-failure
+    # 컨테이너명 설정
+    container_name: sangdo_api_server
+    # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
     ports:
       - '8080:8080'
+    environment:
+      - APP_ENV=dev
     depends_on:
       - db
     links:
       - db
     volumes:
-      - ./app:/code/app
+      - ./app:/app/app
       - /home/ubuntu/uploads:/uploads
     networks:
       - backend
